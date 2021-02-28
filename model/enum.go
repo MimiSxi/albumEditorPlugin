@@ -2,134 +2,164 @@ package model
 
 import "github.com/Fiber-Man/funplugin"
 
-type DeviceStatusEnumType uint
+// 通用状态枚举类型
+type CommonStatusEnumType uint
 
 const (
-	DeviceStatus_NONE     DeviceStatusEnumType = 0 // 未知
-	DeviceStatus_NORMAL   DeviceStatusEnumType = 1 // 正常
-	DeviceStatus_SHUTDOWN DeviceStatusEnumType = 2 // 停用
-	DeviceStatus_VERIFY   DeviceStatusEnumType = 3 // 校验
-	DeviceStatus_RETURN   DeviceStatusEnumType = 4 //  归还
+	C_ENABLE  CommonStatusEnumType = 1 // 可用
+	C_DISABLE CommonStatusEnumType = 2 // 不可用
+	C_DELETE  CommonStatusEnumType = 3 // 删除
 )
 
-func (s DeviceStatusEnumType) Enum() map[string]funplugin.EnumValue {
+func (s CommonStatusEnumType) Enum() map[string]funplugin.EnumValue {
 	return map[string]funplugin.EnumValue{
-		"NONE": funplugin.EnumValue{
-			Value:       DeviceStatus_NONE,
-			Description: "未知",
+		"C_ENABLE": funplugin.EnumValue{
+			Value:       C_ENABLE,
+			Description: "可用",
 		},
-		"NORMAL": funplugin.EnumValue{
-			Value:       DeviceStatus_NORMAL,
-			Description: "正常",
+		"C_DISABLE": funplugin.EnumValue{
+			Value:       C_DISABLE,
+			Description: "不可用",
 		},
-		"SHUTDOWN": funplugin.EnumValue{
-			Value:       DeviceStatus_SHUTDOWN,
-			Description: "停用",
-		},
-		"VERIFY": funplugin.EnumValue{
-			Value:       DeviceStatus_VERIFY,
-			Description: "校验",
-		},
-		"RETURN": funplugin.EnumValue{
-			Value:       DeviceStatus_RETURN,
-			Description: "归还",
+		"C_DELETE": funplugin.EnumValue{
+			Value:       C_DELETE,
+			Description: "删除",
 		},
 	}
 }
 
-type BorrowStatusEnumType uint
+// 分类级别枚举类型
+type MaterialKindLevelEnumType uint
 
 const (
-	BorrowStatus_NONE          BorrowStatusEnumType = 0 // 未知
-	BorrowStatus_NO_APPLY      BorrowStatusEnumType = 1 // 未申请
-	BorrowStatus_TOBE_BORROWED BorrowStatusEnumType = 2 // 待领用
-	BorrowStatus_TOBE_RETURNED BorrowStatusEnumType = 3 // 待归还
+	ONE   MaterialKindLevelEnumType = 1 // 一级分类
+	TWO   MaterialKindLevelEnumType = 2 // 二级分类
+	THREE MaterialKindLevelEnumType = 2 // 三级分类
 )
 
-func (s BorrowStatusEnumType) Enum() map[string]funplugin.EnumValue {
+func (s MaterialKindLevelEnumType) Enum() map[string]funplugin.EnumValue {
 	return map[string]funplugin.EnumValue{
-		"NONE": funplugin.EnumValue{
-			Value:       BorrowStatus_NONE,
-			Description: "未知",
+		"ONE": funplugin.EnumValue{
+			Value:       ONE,
+			Description: "一级分类",
 		},
-		"NO_APPLY": funplugin.EnumValue{
-			Value:       BorrowStatus_NO_APPLY,
-			Description: "未申请",
+		"TWO": funplugin.EnumValue{
+			Value:       TWO,
+			Description: "二级分类",
 		},
-		"TOBE_BORROWED": funplugin.EnumValue{
-			Value:       BorrowStatus_TOBE_BORROWED,
-			Description: "待领用",
-		},
-		"TOBE_RETURNED": funplugin.EnumValue{
-			Value:       BorrowStatus_TOBE_RETURNED,
-			Description: "待归还",
+		"THREE": funplugin.EnumValue{
+			Value:       THREE,
+			Description: "三级分类",
 		},
 	}
 }
 
-type QueryTypeEnumType uint
+// 纸张规格枚举类型
+type AlbumOrderSpecsEnumType uint
 
 const (
-	QueryType_ID           QueryTypeEnumType = 1 // 设备编号
-	QueryType_NAME         QueryTypeEnumType = 2 // 设备名称
-	QueryType_TYPE         QueryTypeEnumType = 3 // 设备型号
-	QueryType_STATUS       QueryTypeEnumType = 4 // 设备状态
-	QueryType_BORROWSTATUE QueryTypeEnumType = 5 // 借用状态
+	K16_A3 AlbumOrderSpecsEnumType = 1 // 16开A3纸
+	K32_A4 AlbumOrderSpecsEnumType = 2 // 32开A4纸
 )
 
-func (s QueryTypeEnumType) Enum() map[string]funplugin.EnumValue {
+func (s AlbumOrderSpecsEnumType) Enum() map[string]funplugin.EnumValue {
 	return map[string]funplugin.EnumValue{
-		"ID": funplugin.EnumValue{
-			Value:       QueryType_ID,
-			Description: "设备编号",
+		"K16_A3": funplugin.EnumValue{
+			Value:       K16_A3,
+			Description: "16开A3纸",
 		},
-		"NAME": funplugin.EnumValue{
-			Value:       QueryType_NAME,
-			Description: "设备名称",
-		},
-		"TYPE": funplugin.EnumValue{
-			Value:       QueryType_TYPE,
-			Description: "设备型号",
-		},
-		"STATUS": funplugin.EnumValue{
-			Value:       QueryType_STATUS,
-			Description: "设备状态",
-		},
-		"BORROWSTATUE": funplugin.EnumValue{
-			Value:       QueryType_BORROWSTATUE,
-			Description: "借用状态",
+		"K32_A4": funplugin.EnumValue{
+			Value:       K32_A4,
+			Description: "32开A4纸",
 		},
 	}
 }
 
-////////////////////////////////////////////////////////////
-
-type ApplyFormStatusEnumType uint
+// 纸张材质枚举类型
+type AlbumOrderMaterialEnumType uint
 
 const (
-	ApplyFormStatus_APPLIED  ApplyFormStatusEnumType = 1 // 申请
-	ApplyFormStatus_BORROWED ApplyFormStatusEnumType = 2 // 领用
-	ApplyFormStatus_RETURNED ApplyFormStatusEnumType = 3 // 归还
-	ApplyFormStatus_CANCEL   ApplyFormStatusEnumType = 4 // 取消
+	COPPERPLATE_200G AlbumOrderMaterialEnumType = 1 // 200g铜版纸
 )
 
-func (s ApplyFormStatusEnumType) Enum() map[string]funplugin.EnumValue {
+func (s AlbumOrderMaterialEnumType) Enum() map[string]funplugin.EnumValue {
 	return map[string]funplugin.EnumValue{
-		"APPLIED": funplugin.EnumValue{
-			Value:       ApplyFormStatus_APPLIED,
-			Description: "申请",
+		"COPPERPLATE_200G": funplugin.EnumValue{
+			Value:       COPPERPLATE_200G,
+			Description: "200g铜版纸",
 		},
-		"BORROWED": funplugin.EnumValue{
-			Value:       ApplyFormStatus_BORROWED,
-			Description: "领用",
+	}
+}
+
+// 使用类型枚举类型
+type AlbumOrderUsageTypeEnumType uint
+
+const (
+	PERSONAL_OR_CHARITY AlbumOrderUsageTypeEnumType = 1 //个人/公益使用
+)
+
+func (s AlbumOrderUsageTypeEnumType) Enum() map[string]funplugin.EnumValue {
+	return map[string]funplugin.EnumValue{
+		"PERSONAL_OR_CHARITY": funplugin.EnumValue{
+			Value:       PERSONAL_OR_CHARITY,
+			Description: "个人/公益使用",
 		},
-		"RETURNED": funplugin.EnumValue{
-			Value:       ApplyFormStatus_RETURNED,
-			Description: "归还",
+	}
+}
+
+// 订单支付方式枚举类型
+type AlbumOrderPayWayEnumType uint
+
+const (
+	WECHAT AlbumOrderPayWayEnumType = 1 //微信
+	ALIPAY AlbumOrderPayWayEnumType = 2 //支付宝
+)
+
+func (s AlbumOrderPayWayEnumType) Enum() map[string]funplugin.EnumValue {
+	return map[string]funplugin.EnumValue{
+		"WECHAT": funplugin.EnumValue{
+			Value:       WECHAT,
+			Description: "微信",
 		},
-		"CANCEL": funplugin.EnumValue{
-			Value:       ApplyFormStatus_CANCEL,
-			Description: "取消",
+		"ALIPAY": funplugin.EnumValue{
+			Value:       ALIPAY,
+			Description: "支付宝",
+		},
+	}
+}
+
+// 订单状态枚举类型
+type AlbumOrderStatusEnumType uint
+
+const (
+	TO_BE_PAID    AlbumOrderStatusEnumType = 1 //待支付
+	TO_BE_DELIVER AlbumOrderStatusEnumType = 2 //待发货
+	HAS_DELIVER   AlbumOrderStatusEnumType = 3 //已发货
+	HAS_RECEIVED  AlbumOrderStatusEnumType = 4 //已收货
+	CANCELED      AlbumOrderStatusEnumType = 5 //订单取消
+)
+
+func (s AlbumOrderStatusEnumType) Enum() map[string]funplugin.EnumValue {
+	return map[string]funplugin.EnumValue{
+		"TO_BE_PAID": funplugin.EnumValue{
+			Value:       TO_BE_PAID,
+			Description: "待支付",
+		},
+		"TO_BE_DELIVER": funplugin.EnumValue{
+			Value:       TO_BE_DELIVER,
+			Description: "待发货",
+		},
+		"HAS_DELIVER": funplugin.EnumValue{
+			Value:       HAS_DELIVER,
+			Description: "已发货",
+		},
+		"HAS_RECEIVED": funplugin.EnumValue{
+			Value:       HAS_RECEIVED,
+			Description: "已收货",
+		},
+		"CANCELED": funplugin.EnumValue{
+			Value:       CANCELED,
+			Description: "订单取消",
 		},
 	}
 }

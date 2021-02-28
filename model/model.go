@@ -37,9 +37,11 @@ func NewDB(gdb *gorm.DB) (err error) {
 	db = gdb
 	db.LogMode(true)
 	db.SetLogger(&Logger{logrus.StandardLogger()})
-
-	db.AutoMigrate(&Device{})
-	db.AutoMigrate(&ApplyForm{})
+	db.AutoMigrate(&Template{})
+	db.AutoMigrate(&Material{})
+	db.AutoMigrate(&AlbumOrder{})
+	db.AutoMigrate(&Banner{})
+	db.AutoMigrate(&TemplateStore{})
 	return nil
 }
 
