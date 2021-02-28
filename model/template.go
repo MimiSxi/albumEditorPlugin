@@ -81,19 +81,19 @@ func (o Template) Create(params graphql.ResolveParams) (Template, error) {
 		o.MedalId = p["medalId"].(string)
 	}
 	if p["basicPage"] != nil {
-		o.BasicPage = p["basicPage"].(uint)
+		o.BasicPage = uint(p["basicPage"].(int))
 	}
 	if p["basicPrice16K"] != nil {
-		o.BasicPrice16K = p["basicPrice16K"].(uint)
+		o.BasicPrice16K = uint(p["basicPrice16K"].(int))
 	}
 	if p["basicPrice32K"] != nil {
-		o.BasicPrice32K = p["basicPrice32K"].(uint)
+		o.BasicPrice32K = uint(p["basicPrice32K"].(int))
 	}
 	if p["oneMorePagePrice16K"] != nil {
-		o.OneMorePagePrice16K = p["oneMorePagePrice16K"].(uint)
+		o.OneMorePagePrice16K = uint(p["oneMorePagePrice16K"].(int))
 	}
 	if p["oneMorePagePrice32K"] != nil {
-		o.OneMorePagePrice32K = p["oneMorePagePrice32K"].(uint)
+		o.OneMorePagePrice32K = uint(p["oneMorePagePrice32K"].(int))
 	}
 	if p["musicLink"] != nil {
 		o.MusicLink = p["musicLink"].(string)
@@ -112,7 +112,7 @@ func (o Template) Update(params graphql.ResolveParams) (Template, error) {
 		v.Name = p["name"].(string)
 	}
 	if p["useCounts"] != nil {
-		v.UseCounts = p["useCounts"].(uint)
+		v.UseCounts = uint(p["useCounts"].(int))
 	}
 	if p["kind"] != nil {
 		v.Kind = p["kind"].(string)
@@ -130,19 +130,19 @@ func (o Template) Update(params graphql.ResolveParams) (Template, error) {
 		v.MedalId = p["medalId"].(string)
 	}
 	if p["basicPage"] != nil {
-		v.BasicPage = p["basicPage"].(uint)
+		v.BasicPage = uint(p["basicPage"].(int))
 	}
 	if p["basicPrice16K"] != nil {
-		v.BasicPrice16K = p["basicPrice16K"].(uint)
+		v.BasicPrice16K = uint(p["basicPrice16K"].(int))
 	}
 	if p["basicPrice32K"] != nil {
-		v.BasicPrice32K = p["basicPrice32K"].(uint)
+		v.BasicPrice32K = uint(p["basicPrice32K"].(int))
 	}
 	if p["oneMorePagePrice16K"] != nil {
-		v.OneMorePagePrice16K = p["oneMorePagePrice16K"].(uint)
+		v.OneMorePagePrice16K = uint(p["oneMorePagePrice16K"].(int))
 	}
 	if p["oneMorePagePrice32K"] != nil {
-		v.OneMorePagePrice32K = p["oneMorePagePrice32K"].(uint)
+		v.OneMorePagePrice32K = uint(p["oneMorePagePrice32K"].(int))
 	}
 	if p["musicLink"] != nil {
 		v.MusicLink = p["musicLink"].(string)

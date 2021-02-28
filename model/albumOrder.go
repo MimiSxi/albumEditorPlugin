@@ -64,13 +64,13 @@ func (o AlbumOrder) Create(params graphql.ResolveParams) (AlbumOrder, error) {
 	p := params.Args
 	// template
 	if p["singlePrice"] != nil {
-		o.SinglePrice = p["singlePrice"].(uint)
+		o.SinglePrice = uint(p["singlePrice"].(int))
 	}
 	if p["amount"] != nil {
-		o.Amount = p["amount"].(uint)
+		o.Amount = uint(p["amount"].(int))
 	}
 	if p["totalPrice"] != nil {
-		o.TotalPrice = p["totalPrice"].(uint)
+		o.TotalPrice = uint(p["totalPrice"].(int))
 	}
 	if p["specs"] != nil {
 		o.Specs = p["specs"].(AlbumOrderSpecsEnumType)
@@ -91,7 +91,7 @@ func (o AlbumOrder) Create(params graphql.ResolveParams) (AlbumOrder, error) {
 		o.Remark = p["remark"].(string)
 	}
 	if p["freightPrice"] != nil {
-		o.TotalPrice = p["freightPrice"].(uint)
+		o.TotalPrice = uint(p["freightPrice"].(int))
 	}
 	if p["paymentId"] != nil {
 		o.PaymentId = p["paymentId"].(string)

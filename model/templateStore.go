@@ -53,10 +53,10 @@ func (o TemplateStore) Create(params graphql.ResolveParams) (TemplateStore, erro
 	// todo
 	p := params.Args
 	if p["userId"] != nil {
-		o.UserId = p["userId"].(uint)
+		o.UserId = uint(p["userId"].(int))
 	}
 	if p["workId"] != nil {
-		o.WorkId = p["workId"].(uint)
+		o.WorkId = uint(p["workId"].(int))
 	}
 	if p["work"] != nil {
 		o.Work = p["work"].(string)
