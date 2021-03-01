@@ -7,6 +7,8 @@
 package model
 
 import (
+	"database/sql/driver"
+	"encoding/json"
 	"errors"
 	"github.com/graphql-go/graphql"
 	"time"
@@ -19,10 +21,28 @@ type Material struct {
 	Kind2     string               `gorm:"Type:varchar(255);DEFAULT:'';NOT NULL;" gqlschema:"create;update;querys" description:"二级分类"`
 	Kind3     string               `gorm:"Type:varchar(255);DEFAULT:'';NOT NULL;" gqlschema:"create;update;querys" description:"三级分类"`
 	Name      string               `gorm:"Type:varchar(255);DEFAULT:'';NOT NULL;" gqlschema:"create;update;querys" description:"名称"`
+	Hash      string               `gorm:"Type:varchar(255);DEFAULT:'';NOT NULL;" gqlschema:"create;update;querys" description:"图片类型hash地址"`
+	Json      AnnexJSON            `gorm:"Type:text;" gqlschema:"create;update" description:"非图片类型json数据"`
 	CreatedAt time.Time            `description:"创建时间" gqlschema:"querys"`
 	UpdatedAt time.Time            `description:"更新时间" gqlschema:"querys"`
 	DeletedAt *time.Time
 	v2        int `gorm:"-" exclude:"true"`
+}
+
+type AnnexJSON map[string]interface{}
+
+func (c AnnexJSON) Value() (driver.Value, error) {
+	b, err := json.Marshal(c)
+	return string(b), err
+}
+
+func (c *AnnexJSON) Scan(input interface{}) error {
+	v, ok := input.([]byte)
+	if !ok {
+		v = []byte(input.(string))
+	}
+	err := json.Unmarshal(v, c)
+	return err
 }
 
 // 素材集合
@@ -56,6 +76,9 @@ func (o Material) Create(params graphql.ResolveParams) (Material, error) {
 	if p["name"] != nil {
 		o.Name = p["name"].(string)
 	}
+	if p["hash"] != nil {
+		o.Hash = p["hash"].(string)
+	}
 	if p["kind1"] != nil {
 		o.Kind1 = p["kind1"].(string)
 	}
@@ -64,6 +87,12 @@ func (o Material) Create(params graphql.ResolveParams) (Material, error) {
 	}
 	if p["kind3"] != nil {
 		o.Kind3 = p["kind3"].(string)
+	}
+	if p["json"] != nil {
+		config := p["json"].(string)
+		if err := json.Unmarshal([]byte(config), &o.Json); err != nil {
+			return o, err
+		}
 	}
 	err := db.Create(&o).Error
 	return o, err
@@ -81,6 +110,9 @@ func (o Material) Update(params graphql.ResolveParams) (Material, error) {
 	if p["name"] != nil {
 		v.Name = p["name"].(string)
 	}
+	if p["hash"] != nil {
+		v.Hash = p["hash"].(string)
+	}
 	if p["kind1"] != nil {
 		v.Kind1 = p["kind1"].(string)
 	}
@@ -89,6 +121,12 @@ func (o Material) Update(params graphql.ResolveParams) (Material, error) {
 	}
 	if p["kind3"] != nil {
 		v.Kind3 = p["kind3"].(string)
+	}
+	if p["json"] != nil {
+		config := p["json"].(string)
+		if err := json.Unmarshal([]byte(config), &v.Json); err != nil {
+			return o, err
+		}
 	}
 	err := db.Save(&v).Error
 	return v, err

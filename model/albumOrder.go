@@ -28,7 +28,7 @@ type AlbumOrder struct {
 	PayWay       AlbumOrderPayWayEnumType    `gorm:"DEFAULT:1;NOT NULL;" gqlschema:"create;update;querys" description:"支付方式枚举类型"`
 	PayTime      time.Time                   `gorm:"DEFAULT:'1970-1-1 00:00:00';" description:"支付时间" gqlschema:"querys"`
 	DeliveryId   string                      `gorm:"Type:varchar(1000);DEFAULT:'';NOT NULL;" gqlschema:"update;querys" description:"快递id"`
-	Status       AlbumOrderPayWayEnumType    `gorm:"DEFAULT:1;NOT NULL;" gqlschema:"create;update;querys" description:"订单状态枚举类型"`
+	Status       AlbumOrderStatusEnumType    `gorm:"DEFAULT:1;NOT NULL;" gqlschema:"create;update;querys" description:"订单状态枚举类型"`
 	CreatedAt    time.Time                   `description:"创建时间" gqlschema:"querys"`
 	UpdatedAt    time.Time                   `description:"更新时间" gqlschema:"querys"`
 	DeletedAt    *time.Time
@@ -101,7 +101,7 @@ func (o AlbumOrder) Create(params graphql.ResolveParams) (AlbumOrder, error) {
 	}
 	o.PayTime = time.Now()
 	if p["status"] != nil {
-		o.Status = p["status"].(AlbumOrderPayWayEnumType)
+		o.Status = p["status"].(AlbumOrderStatusEnumType)
 	}
 	err := db.Create(&o).Error
 	return o, err
@@ -124,7 +124,7 @@ func (o AlbumOrder) Update(params graphql.ResolveParams) (AlbumOrder, error) {
 		v.DeliveryId = p["deliveryId"].(string)
 	}
 	if p["status"] != nil {
-		v.Status = p["status"].(AlbumOrderPayWayEnumType)
+		v.Status = p["status"].(AlbumOrderStatusEnumType)
 	}
 	err := db.Save(&v).Error
 	return v, err
