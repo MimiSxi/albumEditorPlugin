@@ -11,11 +11,13 @@ var materialSchema *funplugin.ObjectSchema
 var albumOrderSchema *funplugin.ObjectSchema
 var bannerSchema *funplugin.ObjectSchema
 var templateStoreSchema *funplugin.ObjectSchema
+var proJSchema *funplugin.ObjectSchema
+var pageSchema *funplugin.ObjectSchema
 
 var load = false
 
 func Init() {
-	// InitAccount()
+	proJSchema.GraphQLType.AddFieldConfig("pages", pageSchema.Query["pages"])
 }
 
 func marge(oc *funplugin.ObjectSchema) {
@@ -56,25 +58,26 @@ func NewPlugSchema(pls funplugin.PluginManger) funplugin.Schema {
 
 		templateStoreSchema, _ = pls.NewSchemaBuilder(model.TemplateStores{})
 		marge(templateStoreSchema)
+
+		proJSchema, _ = pls.NewSchemaBuilder(model.ProJ{})
+		marge(proJSchema)
+
+		pageSchema, _ = pls.NewSchemaBuilder(model.Page{})
+		marge(pageSchema)
+		load = true
+
 		load = true
 	}
 
-	// roleSchema, _ := pls.NewSchemaBuilder(model.Role{})
-	// marge(roleSchema)
-
-	// roleAccountSchema, _ := pls.NewSchemaBuilder(model.RoleAccount{})
-	// marge(roleAccountSchema)
-
 	return funplugin.Schema{
 		Object: map[string]*graphql.Object{
-			// "account": accountType,
 			"template":      templateSchema.GraphQLType,
 			"material":      materialSchema.GraphQLType,
 			"albumOrder":    albumOrderSchema.GraphQLType,
 			"banner":        bannerSchema.GraphQLType,
 			"templateStore": templateStoreSchema.GraphQLType,
-			// "role":        roleSchema.GraphQLType,
-			// "roleaccount": roleAccountSchema.GraphQLType,
+			"proJ":          proJSchema.GraphQLType,
+			"page":          pageSchema.GraphQLType,
 		},
 		Query:    queryFields,
 		Mutation: mutationFields,
