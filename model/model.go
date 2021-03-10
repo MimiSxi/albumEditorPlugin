@@ -41,7 +41,7 @@ func NewDB(gdb *gorm.DB) (err error) {
 	db.AutoMigrate(&Material{})
 	db.AutoMigrate(&AlbumOrder{})
 	db.AutoMigrate(&Banner{})
-	db.AutoMigrate(&TemplateStore{})
+	db.AutoMigrate(&ProJStore{})
 	db.AutoMigrate(&ProJ{})
 	db.AutoMigrate(&Page{})
 	return nil

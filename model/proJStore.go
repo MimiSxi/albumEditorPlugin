@@ -12,11 +12,10 @@ import (
 	"time"
 )
 
-type TemplateStore struct {
+type ProJStore struct {
 	ID        uint                 `gorm:"primary_key" gqlschema:"update!;delete!;query!;querys" description:"ID"`
 	UserId    uint                 `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create;querys" description:"用户id" funservice:"employee"`
-	WorkId    uint                 `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create;querys" description:"workId"`
-	Work      string               `gorm:"Type:varchar(255);DEFAULT:'';NOT NULL;" gqlschema:"create;querys" description:"work"`
+	ProJId    uint                 `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create!;querys" description:"设计器id" funservice:"proJ"`
 	Status    CommonStatusEnumType `gorm:"DEFAULT:1;NOT NULL;" gqlschema:"update;querys" description:"状态"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -24,19 +23,19 @@ type TemplateStore struct {
 	v2        int `gorm:"-" exclude:"true"`
 }
 
-type TemplateStores struct {
+type ProJStores struct {
 	TotalCount int
-	Edges      []TemplateStore
+	Edges      []ProJStore
 }
 
-func (o TemplateStore) Query(params graphql.ResolveParams) (TemplateStore, error) {
+func (o ProJStore) Query(params graphql.ResolveParams) (ProJStore, error) {
 	p := params.Args
 	err := db.Where(p).First(&o).Error
 	return o, err
 }
 
-func (o TemplateStore) Querys(params graphql.ResolveParams) (TemplateStores, error) {
-	var result TemplateStores
+func (o ProJStore) Querys(params graphql.ResolveParams) (ProJStores, error) {
+	var result ProJStores
 
 	dbselect := GenSelet(db, params)
 	dbcount := GenWhere(db.Model(o), params)
@@ -49,24 +48,20 @@ func (o TemplateStore) Querys(params graphql.ResolveParams) (TemplateStores, err
 	return result, err
 }
 
-func (o TemplateStore) Create(params graphql.ResolveParams) (TemplateStore, error) {
-	// todo
+func (o ProJStore) Create(params graphql.ResolveParams) (ProJStore, error) {
 	p := params.Args
 	if p["userId"] != nil {
 		o.UserId = uint(p["userId"].(int))
 	}
-	if p["workId"] != nil {
-		o.WorkId = uint(p["workId"].(int))
-	}
-	if p["work"] != nil {
-		o.Work = p["work"].(string)
+	if p["proJId"] != nil {
+		o.ProJId = uint(p["proJId"].(int))
 	}
 	err := db.Create(&o).Error
 	return o, err
 }
 
-func (o TemplateStore) Update(params graphql.ResolveParams) (TemplateStore, error) {
-	v, ok := params.Source.(TemplateStore)
+func (o ProJStore) Update(params graphql.ResolveParams) (ProJStore, error) {
+	v, ok := params.Source.(ProJStore)
 	if !ok {
 		return o, errors.New("update param")
 	}
@@ -78,8 +73,8 @@ func (o TemplateStore) Update(params graphql.ResolveParams) (TemplateStore, erro
 	return v, err
 }
 
-func (o TemplateStore) Delete(params graphql.ResolveParams) (TemplateStore, error) {
-	v, ok := params.Source.(TemplateStore)
+func (o ProJStore) Delete(params graphql.ResolveParams) (ProJStore, error) {
+	v, ok := params.Source.(ProJStore)
 	if !ok {
 		return o, errors.New("delete param")
 	}
