@@ -15,8 +15,8 @@ import (
 type Template struct {
 	ID                  uint                 `gorm:"primary_key" gqlschema:"update!;delete!;query!;querys" description:"ID"`
 	Name                string               `gorm:"Type:varchar(1000);DEFAULT:'';NOT NULL;" gqlschema:"create!;update;querys" description:"模板名称"`
-	ProJId              string               `gorm:"Type:varchar(255);DEFAULT:'';NOT NULL;" gqlschema:"create!;querys" description:"模板使用的设计器项目id"`
-	Kind                string               `gorm:"Type:varchar(255);DEFAULT:'';NOT NULL;" gqlschema:"create;update;querys" description:"模板分类"`
+	ProJ                string               `gorm:"Type:varchar(255);DEFAULT:'';NOT NULL;" gqlschema:"create;update;querys" description:"复制"`
+	Kind                string               `gorm:"Type:text" gqlschema:"create;update;querys" description:"模板分类"`
 	Theme               string               `gorm:"Type:varchar(255);DEFAULT:'';NOT NULL;" gqlschema:"create;update;querys" description:"模板主题"`
 	Usage               string               `gorm:"Type:varchar(255);DEFAULT:'';NOT NULL;" gqlschema:"create;update;querys" description:"模板用途"`
 	UseCounts           uint                 `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"querys;update;" description:"使用次数"`
@@ -32,7 +32,6 @@ type Template struct {
 	UpdatedAt           time.Time            `description:"更新时间" gqlschema:"querys"`
 	DeletedAt           *time.Time           `description:"删除时间" gqlschema:"querys"`
 	v2                  int                  `gorm:"-" exclude:"true"`
-	//proj:PhotoShop.Proj  模板使用的设计器项目
 }
 
 // 模版集合
@@ -64,9 +63,11 @@ func (o Template) Querys(params graphql.ResolveParams) (Templates, error) {
 func (o Template) Create(params graphql.ResolveParams) (Template, error) {
 	p := params.Args
 	o.Name = p["name"].(string)
-	o.ProJId = p["proJId"].(string)
 	if p["kind"] != nil {
 		o.Kind = p["kind"].(string)
+	}
+	if p["proJ"] != nil {
+		o.ProJ = p["proJ"].(string)
 	}
 	if p["status"] != nil {
 		o.Status = p["status"].(CommonStatusEnumType)
@@ -110,6 +111,9 @@ func (o Template) Update(params graphql.ResolveParams) (Template, error) {
 	p := params.Args
 	if p["name"] != nil {
 		v.Name = p["name"].(string)
+	}
+	if p["proJ"] != nil {
+		v.ProJ = p["proJ"].(string)
 	}
 	if p["useCounts"] != nil {
 		v.UseCounts = uint(p["useCounts"].(int))

@@ -23,44 +23,11 @@ type ProJ struct {
 	Pages      string                   `gorm:"Type:text;" gqlschema:"create;update" description:"画布" exclude:"true"`
 	ImgUpload  string                   `gorm:"Type:text;" gqlschema:"create;update" description:"图片json"`
 	TempUsedId uint                     `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create!;update;querys" description:"使用的模版id" funservice:"template"`
-	TempUsed   []Template
 	CreatedAt  time.Time `description:"创建时间" gqlschema:"querys"`
 	UpdatedAt  time.Time `description:"更新时间" gqlschema:"querys"`
 	DeletedAt  *time.Time
 	v2         int `gorm:"-" exclude:"true"`
 }
-
-//mutation{
-//albumEditor{
-//projs{
-//action{
-//create(cover:"1",name:"name",userId:1,
-//pages:"[{\"renderRes\":\"11\",\"status\":1,\"direction\":1,\"pType\":1,\"canvasJson\":\"canvasJson1\"}, {\"renderRes\":\"22\",\"status\":1,\"pType\":2,\"canvasJson\":\"canvasJson2\"}]"){
-//id
-//}
-//}
-//}
-//}
-//}
-
-//mutation{
-//albumEditor{
-//proj(id:1){
-//id
-//name
-//pages{
-//totalCount
-//edges{
-//proJId
-//status
-//direction
-//font
-//canvasJson
-//}
-//}
-//}
-//}
-//}
 
 // 设计器项目集合
 type ProJs struct {
@@ -71,9 +38,6 @@ type ProJs struct {
 func (o ProJ) Query(params graphql.ResolveParams) (ProJ, error) {
 	p := params.Args
 	err := db.Where(p).First(&o).Error
-	if o.TempUsedId != 0{
-		err = db.Where("id = ?",o.TempUsedId).First(&Template{}).Find(&o.TempUsed).Error
-	}
 	return o, err
 }
 
@@ -138,7 +102,6 @@ func (o ProJ) Update(params graphql.ResolveParams) (ProJ, error) {
 		return o, errors.New("update param")
 	}
 	p := params.Args
-	// todo pages:[Page]
 	var pages []Page
 	if p["pages"] != nil {
 		pageJson := p["pages"].(string)

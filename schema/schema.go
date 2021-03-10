@@ -1,8 +1,10 @@
 package schema
 
 import (
+	"errors"
 	"github.com/Fiber-Man/albumEditorPlugin/model"
 	"github.com/Fiber-Man/funplugin"
+	"github.com/Fiber-Man/funplugin/plugin"
 	"github.com/graphql-go/graphql"
 )
 
@@ -18,6 +20,12 @@ var load = false
 
 func Init() {
 	proJSchema.GraphQLType.AddFieldConfig("pages", pageSchema.Query["pages"])
+
+	if field, err := plugin.AutoField("TempUsedId:template"); err != nil {
+		panic(errors.New("not have object type"))
+	} else {
+		proJSchema.GraphQLType.AddFieldConfig("tempUsed", field)
+	}
 }
 
 func marge(oc *funplugin.ObjectSchema) {
