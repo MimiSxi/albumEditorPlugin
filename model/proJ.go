@@ -15,16 +15,19 @@ import (
 )
 
 type ProJ struct {
-	ID        uint                     `gorm:"primary_key" gqlschema:"update!;delete!;query!;querys" description:"设计器项目id"`
-	UserId    uint                     `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create!;querys" description:"创建用户id" funservice:"employee"`
-	Status    ProJCommonStatusEnumType `gorm:"DEFAULT:1;NOT NULL;" gqlschema:"update;querys" description:"状态"`
-	Name      string                   `gorm:"Type:varchar(64);DEFAULT:'';NOT NULL;" gqlschema:"create!;update;querys" description:"项目名称"`
-	Cover     string                   `gorm:"Type:text;" gqlschema:"create!;update;querys" description:"封面"`
-	Pages     string                   `gorm:"Type:text;" gqlschema:"create;update" description:"画布" exclude:"true"`
-	CreatedAt time.Time                `description:"创建时间" gqlschema:"querys"`
-	UpdatedAt time.Time                `description:"更新时间" gqlschema:"querys"`
-	DeletedAt *time.Time
-	v2        int `gorm:"-" exclude:"true"`
+	ID         uint                     `gorm:"primary_key" gqlschema:"update!;delete!;query!;querys" description:"设计器项目id"`
+	UserId     uint                     `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create!;querys" description:"创建用户id" funservice:"employee"`
+	Status     ProJCommonStatusEnumType `gorm:"DEFAULT:1;NOT NULL;" gqlschema:"update;querys" description:"状态"`
+	Name       string                   `gorm:"Type:varchar(64);DEFAULT:'';NOT NULL;" gqlschema:"create!;update;querys" description:"项目名称"`
+	Cover      string                   `gorm:"Type:text;" gqlschema:"create!;update;querys" description:"封面"`
+	Pages      string                   `gorm:"Type:text;" gqlschema:"create;update" description:"画布" exclude:"true"`
+	ImgUpload  string                   `gorm:"Type:text;" gqlschema:"create;update" description:"图片json"`
+	TempUsedId uint                     `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create!;update;querys" description:"使用的模版id" funservice:"template"`
+	TempUsed   []Template
+	CreatedAt  time.Time `description:"创建时间" gqlschema:"querys"`
+	UpdatedAt  time.Time `description:"更新时间" gqlschema:"querys"`
+	DeletedAt  *time.Time
+	v2         int `gorm:"-" exclude:"true"`
 }
 
 //mutation{
@@ -68,6 +71,9 @@ type ProJs struct {
 func (o ProJ) Query(params graphql.ResolveParams) (ProJ, error) {
 	p := params.Args
 	err := db.Where(p).First(&o).Error
+	if o.TempUsedId != 0{
+		err = db.Where("id = ?",o.TempUsedId).First(&Template{}).Find(&o.TempUsed).Error
+	}
 	return o, err
 }
 
@@ -87,6 +93,9 @@ func (o ProJ) Create(params graphql.ResolveParams) (ProJ, error) {
 	p := params.Args
 	if p["name"] != nil {
 		o.Name = p["name"].(string)
+	}
+	if p["imgUpload"] != nil {
+		o.ImgUpload = p["imgUpload"].(string)
 	}
 	var pages []Page
 	if p["pages"] != nil {
@@ -130,6 +139,33 @@ func (o ProJ) Update(params graphql.ResolveParams) (ProJ, error) {
 	}
 	p := params.Args
 	// todo pages:[Page]
+	var pages []Page
+	if p["pages"] != nil {
+		pageJson := p["pages"].(string)
+		err := json.Unmarshal([]byte(pageJson), &pages)
+		if err != nil {
+			return o, err
+		}
+	}
+	err := db.Where("pro_j_id = ?", v.ID).Delete(&Page{}).Error
+	err = db.Transaction(func(tx *gorm.DB) error {
+		// 创建page
+		for _, v := range pages {
+			if err := tx.Create(
+				&Page{
+					ProJId:     o.ID,
+					RenderRes:  v.RenderRes,
+					Status:     v.Status,
+					Direction:  v.Direction,
+					PType:      v.PType,
+					CanvasJson: v.CanvasJson,
+					Font:       v.Font,
+				}).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 	if p["status"] != nil {
 		v.Status = p["status"].(ProJCommonStatusEnumType)
 	}
@@ -139,7 +175,10 @@ func (o ProJ) Update(params graphql.ResolveParams) (ProJ, error) {
 	if p["cover"] != nil {
 		v.Cover = p["cover"].(string)
 	}
-	err := db.Save(&v).Error
+	if p["imgUpload"] != nil {
+		v.ImgUpload = p["imgUpload"].(string)
+	}
+	err = db.Save(&v).Error
 	return v, err
 }
 
@@ -149,5 +188,6 @@ func (o ProJ) Delete(params graphql.ResolveParams) (ProJ, error) {
 		return o, errors.New("delete param")
 	}
 	err := db.Delete(&v).Error
+	err = db.Where("pro_j_id = ?", v.ID).Delete(&Page{}).Error
 	return v, err
 }
