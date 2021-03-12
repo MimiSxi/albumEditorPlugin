@@ -15,7 +15,7 @@ import (
 type Template struct {
 	ID                  uint                 `gorm:"primary_key" gqlschema:"update!;delete!;query!;querys" description:"ID"`
 	Name                string               `gorm:"Type:varchar(1000);DEFAULT:'';NOT NULL;" gqlschema:"create!;update;querys" description:"模板名称"`
-	ProJ                string               `gorm:"Type:varchar(255);DEFAULT:'';NOT NULL;" gqlschema:"create;update;querys" description:"复制"`
+	ProId               uint                 `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create;update;querys" funservice:"proJ" description:"ProJId"`
 	Kind                string               `gorm:"Type:text" gqlschema:"create;update;querys" description:"模板分类"`
 	Theme               string               `gorm:"Type:varchar(255);DEFAULT:'';NOT NULL;" gqlschema:"create;update;querys" description:"模板主题"`
 	Usage               string               `gorm:"Type:varchar(255);DEFAULT:'';NOT NULL;" gqlschema:"create;update;querys" description:"模板用途"`
@@ -38,7 +38,21 @@ type Template struct {
 type Templates struct {
 	TotalCount int
 	Edges      []Template
+	//Groups     TemplateGroup
 }
+
+//
+//type TemplateGroup struct {
+//	Kind  []TemplateGroupType
+//	Usage []TemplateGroupType
+//	Theme []TemplateGroupType
+//}
+//
+//type TemplateGroupType struct {
+//	Id    uint
+//	Name  string
+//	Count int
+//}
 
 func (o Template) Query(params graphql.ResolveParams) (Template, error) {
 	p := params.Args
@@ -67,7 +81,26 @@ func (o Template) Create(params graphql.ResolveParams) (Template, error) {
 		o.Kind = p["kind"].(string)
 	}
 	if p["proJ"] != nil {
-		o.ProJ = p["proJ"].(string)
+		OldProJId := uint(p["proJ"].(int))
+		p := &ProJ{}
+		err := db.Where("id = ?", OldProJId).First(p).Error
+		if err != nil {
+			return o, err
+		}
+		n := &ProJ{}
+		n.UserId = p.UserId
+		n.Status = p.Status
+		n.Name = p.Name
+		n.Cover = p.Cover
+		n.Pages = p.Pages
+		n.ImgUpload = p.ImgUpload
+		n.TempUsedId = p.TempUsedId
+		n.IsCopy = 2
+		err = db.Create(n).Error
+		if err != nil {
+			return o, err
+		}
+		o.ProId = n.ID
 	}
 	if p["status"] != nil {
 		o.Status = p["status"].(CommonStatusEnumType)
@@ -113,7 +146,26 @@ func (o Template) Update(params graphql.ResolveParams) (Template, error) {
 		v.Name = p["name"].(string)
 	}
 	if p["proJ"] != nil {
-		v.ProJ = p["proJ"].(string)
+		OldProJId := uint(p["proJ"].(int))
+		p := &ProJ{}
+		err := db.Where("id = ?", OldProJId).First(p).Error
+		if err != nil {
+			return o, err
+		}
+		n := &ProJ{}
+		n.UserId = p.UserId
+		n.Status = p.Status
+		n.Name = p.Name
+		n.Cover = p.Cover
+		n.Pages = p.Pages
+		n.ImgUpload = p.ImgUpload
+		n.TempUsedId = p.TempUsedId
+		n.IsCopy = 2
+		err = db.Create(n).Error
+		if err != nil {
+			return o, err
+		}
+		v.ProId = n.ID
 	}
 	if p["useCounts"] != nil {
 		v.UseCounts = uint(p["useCounts"].(int))
