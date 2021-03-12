@@ -8,12 +8,14 @@ package model
 
 import (
 	"errors"
+	"github.com/Fiber-Man/funplugin/plugin"
 	"github.com/graphql-go/graphql"
 	"time"
 )
 
 type AlbumOrder struct {
 	ID           uint                        `gorm:"primary_key" gqlschema:"update!;delete!;query!;querys" description:"订单id"`
+	UserId       uint                        `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create!;querys" description:"创建用户id" funservice:"employee"`
 	SinglePrice  uint                        `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create;querys" description:"单价"`
 	Amount       uint                        `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create;querys" description:"数量"`
 	TotalPrice   uint                        `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create;querys" description:"总价"`
@@ -40,6 +42,32 @@ type AlbumOrders struct {
 	Edges      []AlbumOrder
 }
 
+// 跨接口创建订单
+func createOrder(userId uint, referId uint, referType string, remark string) (err error) {
+	mutation := `mutation ($userId: Int!, $childrenId: Int!, $childrenType: OrderInfoChildrenTypeEnum!, $remark: String) {
+				  order {
+					orderinfos {
+					  action {
+						create(userId: $userId, childrenId: $childrenId, childrenType: $childrenType, remark: $remark) {
+						  id
+						}
+					  }
+					}
+				  }
+				}`
+	params := map[string]interface{}{
+		"userId":       userId,
+		"childrenId":   referId,
+		"childrenType": referType,
+		"remark":       remark,
+	}
+	_, err = plugin.Go(mutation, params, nil)
+	if err != nil {
+		return err
+	}
+	return
+}
+
 func (o AlbumOrder) Query(params graphql.ResolveParams) (AlbumOrder, error) {
 	p := params.Args
 	err := db.Where(p).First(&o).Error
@@ -62,6 +90,7 @@ func (o AlbumOrder) Querys(params graphql.ResolveParams) (AlbumOrders, error) {
 
 func (o AlbumOrder) Create(params graphql.ResolveParams) (AlbumOrder, error) {
 	p := params.Args
+	o.UserId = uint(p["userId"].(int))
 	// template
 	if p["singlePrice"] != nil {
 		o.SinglePrice = uint(p["singlePrice"].(int))
@@ -104,6 +133,7 @@ func (o AlbumOrder) Create(params graphql.ResolveParams) (AlbumOrder, error) {
 		o.Status = p["status"].(AlbumOrderStatusEnumType)
 	}
 	err := db.Create(&o).Error
+	err = createOrder(o.UserId, o.ID, "PHOTO_ALBUM", o.Remark)
 	return o, err
 }
 
