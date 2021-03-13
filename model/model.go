@@ -44,6 +44,7 @@ func NewDB(gdb *gorm.DB) (err error) {
 	db.AutoMigrate(&ProJStore{})
 	db.AutoMigrate(&ProJ{})
 	db.AutoMigrate(&Page{})
+	db.AutoMigrate(&OrderInfo{})
 	return nil
 }
 

@@ -246,3 +246,45 @@ func (s PageDirectionEnumType) Enum() map[string]funplugin.EnumValue {
 		},
 	}
 }
+
+// 订单类型
+type OrderInfoChildrenTypeEnum uint
+
+const (
+	PHOTO_ALBUM OrderInfoChildrenTypeEnum = 1 // 相册系统
+)
+
+func (s OrderInfoChildrenTypeEnum) Enum() map[string]funplugin.EnumValue {
+	return map[string]funplugin.EnumValue{
+		"PHOTO_ALBUM": funplugin.EnumValue{
+			Value:       PHOTO_ALBUM,
+			Description: "相册系统",
+		},
+	}
+}
+
+// 订单状态
+type OrderInfoStatusEnum uint
+
+const (
+	ORDER_UNFINISH OrderInfoStatusEnum = 1 // 未完成
+	ORDER_FINISH   OrderInfoStatusEnum = 2 // 已经完成
+	ORDER_DELETE   OrderInfoStatusEnum = 3 // 已删除
+)
+
+func (s OrderInfoStatusEnum) Enum() map[string]funplugin.EnumValue {
+	return map[string]funplugin.EnumValue{
+		"ORDER_UNFINISH": funplugin.EnumValue{
+			Value:       ORDER_UNFINISH,
+			Description: "未完成",
+		},
+		"ORDER_FINISH": funplugin.EnumValue{
+			Value:       ORDER_FINISH,
+			Description: "已经完成",
+		},
+		"ORDER_DELETE": funplugin.EnumValue{
+			Value:       ORDER_DELETE,
+			Description: "已删除",
+		},
+	}
+}

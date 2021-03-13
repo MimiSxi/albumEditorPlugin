@@ -9,11 +9,13 @@ package model
 import (
 	"errors"
 	"github.com/graphql-go/graphql"
+	"github.com/jinzhu/gorm"
 	"time"
 )
 
 type AlbumOrder struct {
 	ID           uint                        `gorm:"primary_key" gqlschema:"update!;delete!;query!;querys" description:"订单id"`
+	UserId       uint                        `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create!;querys" description:"创建用户id" funservice:"employee"`
 	SinglePrice  uint                        `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create;querys" description:"单价"`
 	Amount       uint                        `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create;querys" description:"数量"`
 	TotalPrice   uint                        `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create;querys" description:"总价"`
@@ -62,6 +64,7 @@ func (o AlbumOrder) Querys(params graphql.ResolveParams) (AlbumOrders, error) {
 
 func (o AlbumOrder) Create(params graphql.ResolveParams) (AlbumOrder, error) {
 	p := params.Args
+	o.UserId = uint(p["userId"].(int))
 	// template
 	if p["singlePrice"] != nil {
 		o.SinglePrice = uint(p["singlePrice"].(int))
@@ -104,6 +107,19 @@ func (o AlbumOrder) Create(params graphql.ResolveParams) (AlbumOrder, error) {
 		o.Status = p["status"].(AlbumOrderStatusEnumType)
 	}
 	err := db.Create(&o).Error
+	err = db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(
+			&OrderInfo{
+				UserId:       o.UserId,
+				ChildrenId:   o.ID,
+				ChildrenType: PHOTO_ALBUM,
+				Remark:       o.Remark,
+				Status:       ORDER_UNFINISH,
+			}).Error; err != nil {
+			return err
+		}
+		return nil
+	})
 	return o, err
 }
 
