@@ -8,8 +8,8 @@ package model
 
 import (
 	"errors"
-	"github.com/Fiber-Man/funplugin/plugin"
 	"github.com/graphql-go/graphql"
+	"github.com/jinzhu/gorm"
 	"time"
 )
 
@@ -40,32 +40,6 @@ type AlbumOrder struct {
 type AlbumOrders struct {
 	TotalCount int
 	Edges      []AlbumOrder
-}
-
-// 跨接口创建订单
-func createOrder(userId uint, referId uint, referType string, remark string) (err error) {
-	mutation := `mutation ($userId: Int!, $childrenId: Int!, $childrenType: OrderInfoChildrenTypeEnum!, $remark: String) {
-				  order {
-					orderinfos {
-					  action {
-						create(userId: $userId, childrenId: $childrenId, childrenType: $childrenType, remark: $remark) {
-						  id
-						}
-					  }
-					}
-				  }
-				}`
-	params := map[string]interface{}{
-		"userId":       userId,
-		"childrenId":   referId,
-		"childrenType": referType,
-		"remark":       remark,
-	}
-	_, err = plugin.Go(mutation, params, nil)
-	if err != nil {
-		return err
-	}
-	return
 }
 
 func (o AlbumOrder) Query(params graphql.ResolveParams) (AlbumOrder, error) {
@@ -133,7 +107,19 @@ func (o AlbumOrder) Create(params graphql.ResolveParams) (AlbumOrder, error) {
 		o.Status = p["status"].(AlbumOrderStatusEnumType)
 	}
 	err := db.Create(&o).Error
-	err = createOrder(o.UserId, o.ID, "PHOTO_ALBUM", o.Remark)
+	err = db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(
+			&OrderInfo{
+				UserId:       o.UserId,
+				ChildrenId:   o.ID,
+				ChildrenType: PHOTO_ALBUM,
+				Remark:       o.Remark,
+				Status:       ORDER_UNFINISH,
+			}).Error; err != nil {
+			return err
+		}
+		return nil
+	})
 	return o, err
 }
 
