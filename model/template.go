@@ -38,21 +38,19 @@ type Template struct {
 type Templates struct {
 	TotalCount int
 	Edges      []Template
-	//Groups     TemplateGroup
+	Groups     TemplateGroup
 }
 
-//
-//type TemplateGroup struct {
-//	Kind  []TemplateGroupType
-//	Usage []TemplateGroupType
-//	Theme []TemplateGroupType
-//}
-//
-//type TemplateGroupType struct {
-//	Id    uint
-//	Name  string
-//	Count int
-//}
+type TemplateGroup struct {
+	Kind  []TemplateGroupType
+	Usage []TemplateGroupType
+	Theme []TemplateGroupType
+}
+
+type TemplateGroupType struct {
+	Name  string
+	Count int
+}
 
 func (o Template) Query(params graphql.ResolveParams) (Template, error) {
 	p := params.Args
@@ -71,6 +69,24 @@ func (o Template) Querys(params graphql.ResolveParams) (Templates, error) {
 		return result, err
 	}
 	err = dbcount.Count(&result.TotalCount).Error
+	if err != nil {
+		return result, err
+	}
+
+	err = db.Select("kind as name, COUNT(id) as count").Group("kind").Find(&result.Groups.Kind).Error
+	if err != nil {
+		return result, err
+	}
+
+	err = db.Select("usage as name, COUNT(id) as count").Group("usage").Find(&result.Groups.Usage).Error
+	if err != nil {
+		return result, err
+	}
+
+	err = db.Select("theme as name, COUNT(id) as count").Group("theme").Find(&result.Groups.Theme).Error
+	if err != nil {
+		return result, err
+	}
 	return result, err
 }
 
