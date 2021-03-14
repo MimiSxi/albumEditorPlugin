@@ -33,6 +33,10 @@ type AlbumOrders struct {
 	Edges      []AlbumOrder
 }
 
+func (o *AlbumOrder) QueryByID(id uint) (err error) {
+	return db.Where("id = ?", id).First(&o).Error
+}
+
 func (o AlbumOrder) Query(params graphql.ResolveParams) (AlbumOrder, error) {
 	p := params.Args
 	err := db.Where(p).First(&o).Error
