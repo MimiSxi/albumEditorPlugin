@@ -18,8 +18,8 @@ type ProJ struct {
 	UserId     uint                     `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create!;querys" description:"创建用户id" funservice:"employee"`
 	Status     ProJCommonStatusEnumType `gorm:"DEFAULT:1;NOT NULL;" gqlschema:"update;querys" description:"状态"`
 	Name       string                   `gorm:"Type:varchar(64);DEFAULT:'';NOT NULL;" gqlschema:"create!;update;querys" description:"项目名称"`
-	Cover      string                   `gorm:"Type:text;" gqlschema:"create!;update;querys" description:"封面"`
-	Pages      string                   `gorm:"Type:text;" gqlschema:"create;update" description:"画布"`
+	Cover      string                   `gorm:"Type:longText;" gqlschema:"create!;update;querys" description:"封面"`
+	Pages      string                   `gorm:"Type:longText;" gqlschema:"create;update" description:"画布"`
 	ImgUpload  string                   `gorm:"Type:text;" gqlschema:"create;update" description:"图片json"`
 	TempUsedId uint                     `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create;update;querys" description:"使用的模版id" funservice:"template"`
 	IsCopy     uint                     `gorm:"DEFAULT:1;NOT NULL;" exclude:"true"` // 1。代表原生 2拷贝

@@ -6,7 +6,6 @@ import (
 	"github.com/Fiber-Man/funplugin"
 	"github.com/Fiber-Man/funplugin/plugin"
 	"github.com/graphql-go/graphql"
-	"reflect"
 )
 
 var templateSchema *funplugin.ObjectSchema
@@ -15,13 +14,13 @@ var albumOrderSchema *funplugin.ObjectSchema
 var bannerSchema *funplugin.ObjectSchema
 var proJStoreSchema *funplugin.ObjectSchema
 var proJSchema *funplugin.ObjectSchema
+//var orderInfoSchema *funplugin.ObjectSchema
 
 //var pageSchema *funplugin.ObjectSchema
 
 var load = false
 
 func Init() {
-	InitAlbumEditor()
 	//proJSchema.GraphQLType.AddFieldConfig("pages", pageSchema.Query["pages"])
 
 	if field, err := plugin.AutoField("TempUsedId:template"); err != nil {
@@ -48,57 +47,6 @@ func Init() {
 		proJStoreSchema.GraphQLType.AddFieldConfig("user", field)
 	}
 }
-
-func InitAlbumEditor() {
-	obj, ok := plugin.GetObject("orderInfo")
-	if !ok {
-		panic(errors.New("not have object type"))
-	}
-
-	obj.AddFieldConfig("albumOrder", &graphql.Field{
-		Type:        albumOrderSchema.GraphQLType,
-		Description: "albumOrder type",
-		Args:        graphql.FieldConfigArgument{},
-		Resolve: func(p graphql.ResolveParams) (result interface{}, err error) {
-			v := reflect.ValueOf(p.Source)
-			var id uint
-			{
-				struct_model := v.FieldByName("Model")
-				if !struct_model.IsValid() {
-					panic("bad field Model")
-				}
-				model := struct_model.Interface()
-				struct_gorm_model := reflect.ValueOf(model)
-				idx := struct_gorm_model.FieldByName("ID")
-				if !idx.IsValid() {
-					panic("bad field in gorm.Model id")
-				}
-				id = uint(idx.Uint())
-			}
-
-			var typestr string
-			{
-				referx := v.FieldByName("ChildrenType")
-				if !referx.IsValid() {
-					panic("bad field ReferType")
-				}
-				typestr = referx.String()
-			}
-
-			if typestr != "albumOrder" {
-				return nil, nil
-			}
-
-			obj := &model.AlbumOrder{}
-			err = obj.QueryByID(id)
-			if err != nil {
-				return nil, err
-			}
-			return *obj, nil
-		},
-	})
-}
-
 
 func marge(oc *funplugin.ObjectSchema) {
 	for k, v := range oc.Query {
@@ -142,6 +90,9 @@ func NewPlugSchema(pls funplugin.PluginManger) funplugin.Schema {
 		proJSchema, _ = pls.NewSchemaBuilder(model.ProJ{})
 		marge(proJSchema)
 
+		//orderInfoSchema, _ = pls.NewSchemaBuilder(model.OrderInfo{})
+		//marge(orderInfoSchema)
+
 		//pageSchema, _ = pls.NewSchemaBuilder(model.Page{})
 		//marge(pageSchema)
 		load = true
@@ -157,6 +108,7 @@ func NewPlugSchema(pls funplugin.PluginManger) funplugin.Schema {
 			"banner":        bannerSchema.GraphQLType,
 			"templateStore": proJStoreSchema.GraphQLType,
 			"proJ":          proJSchema.GraphQLType,
+			//"orderInfo":     orderInfoSchema.GraphQLType,
 
 			//"page":          pageSchema.GraphQLType,
 		},

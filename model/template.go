@@ -73,17 +73,17 @@ func (o Template) Querys(params graphql.ResolveParams) (Templates, error) {
 		return result, err
 	}
 
-	err = db.Select("kind as name, COUNT(id) as count").Group("kind").Find(&result.Groups.Kind).Error
+	err = db.Model(&Template{}).Select("kind as name, COUNT(id) as count").Group("kind").Scan(&result.Groups.Kind).Error
 	if err != nil {
 		return result, err
 	}
 
-	err = db.Select("usage as name, COUNT(id) as count").Group("usage").Find(&result.Groups.Usage).Error
+	err = db.Model(&Template{}).Select("'usage' as name, COUNT(id) as count").Group("'usage'").Scan(&result.Groups.Usage).Error
 	if err != nil {
 		return result, err
 	}
 
-	err = db.Select("theme as name, COUNT(id) as count").Group("theme").Find(&result.Groups.Theme).Error
+	err = db.Model(&Template{}).Select("theme as name, COUNT(id) as count").Group("theme").Scan(&result.Groups.Theme).Error
 	if err != nil {
 		return result, err
 	}

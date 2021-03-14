@@ -80,17 +80,17 @@ func (o Material) Querys(params graphql.ResolveParams) (Materials, error) {
 		return result, err
 	}
 	err = dbcount.Count(&result.TotalCount).Error
-	err = db.Select("kind1 as name, COUNT(id) as count").Group("kind1").Find(&result.Groups.Kind1).Error
+	err = db.Model(&Material{}).Select("kind1 as name, COUNT(id) as count").Group("kind1").Scan(&result.Groups.Kind1).Error
 	if err != nil {
 		return result, err
 	}
 
-	err = db.Select("kind2 as name, COUNT(id) as count").Group("kind2").Find(&result.Groups.Kind2).Error
+	err = db.Model(&Material{}).Select("kind2 as name, COUNT(id) as count").Group("kind2").Scan(&result.Groups.Kind2).Error
 	if err != nil {
 		return result, err
 	}
 
-	err = db.Select("kind3 as name, COUNT(id) as count").Group("kind3").Find(&result.Groups.Kind3).Error
+	err = db.Model(&Material{}).Select("kind3 as name, COUNT(id) as count").Group("kind3").Scan(&result.Groups.Kind3).Error
 	if err != nil {
 		return result, err
 	}
