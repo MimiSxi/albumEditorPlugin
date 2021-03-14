@@ -14,7 +14,6 @@ var albumOrderSchema *funplugin.ObjectSchema
 var bannerSchema *funplugin.ObjectSchema
 var proJStoreSchema *funplugin.ObjectSchema
 var proJSchema *funplugin.ObjectSchema
-var orderInfoSchema *funplugin.ObjectSchema
 
 //var pageSchema *funplugin.ObjectSchema
 
@@ -90,9 +89,6 @@ func NewPlugSchema(pls funplugin.PluginManger) funplugin.Schema {
 		proJSchema, _ = pls.NewSchemaBuilder(model.ProJ{})
 		marge(proJSchema)
 
-		orderInfoSchema, _ = pls.NewSchemaBuilder(model.OrderInfo{})
-		marge(orderInfoSchema)
-
 		//pageSchema, _ = pls.NewSchemaBuilder(model.Page{})
 		//marge(pageSchema)
 		load = true
@@ -108,7 +104,6 @@ func NewPlugSchema(pls funplugin.PluginManger) funplugin.Schema {
 			"banner":        bannerSchema.GraphQLType,
 			"templateStore": proJStoreSchema.GraphQLType,
 			"proJ":          proJSchema.GraphQLType,
-			"orderInfo":     orderInfoSchema.GraphQLType,
 
 			//"page":          pageSchema.GraphQLType,
 		},
