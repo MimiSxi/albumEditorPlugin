@@ -49,6 +49,18 @@ func (c *AnnexJSON) Scan(input interface{}) error {
 type Materials struct {
 	TotalCount int
 	Edges      []Material
+	Groups     MaterialsGroup
+}
+
+type MaterialsGroup struct {
+	Kind1 []MaterialsGroupType
+	Kind2 []MaterialsGroupType
+	Kind3 []MaterialsGroupType
+}
+
+type MaterialsGroupType struct {
+	Name  string
+	Count int
 }
 
 func (o Material) Query(params graphql.ResolveParams) (Material, error) {
@@ -68,6 +80,20 @@ func (o Material) Querys(params graphql.ResolveParams) (Materials, error) {
 		return result, err
 	}
 	err = dbcount.Count(&result.TotalCount).Error
+	err = db.Select("kind1 as name, COUNT(id) as count").Group("kind1").Find(&result.Groups.Kind1).Error
+	if err != nil {
+		return result, err
+	}
+
+	err = db.Select("kind2 as name, COUNT(id) as count").Group("kind2").Find(&result.Groups.Kind2).Error
+	if err != nil {
+		return result, err
+	}
+
+	err = db.Select("kind3 as name, COUNT(id) as count").Group("kind3").Find(&result.Groups.Kind3).Error
+	if err != nil {
+		return result, err
+	}
 	return result, err
 }
 
