@@ -107,63 +107,6 @@ func (s AlbumOrderUsageTypeEnumType) Enum() map[string]funplugin.EnumValue {
 	}
 }
 
-// 订单支付方式枚举类型
-type AlbumOrderPayWayEnumType uint
-
-const (
-	WECHAT AlbumOrderPayWayEnumType = 1 //微信
-	ALIPAY AlbumOrderPayWayEnumType = 2 //支付宝
-)
-
-func (s AlbumOrderPayWayEnumType) Enum() map[string]funplugin.EnumValue {
-	return map[string]funplugin.EnumValue{
-		"WECHAT": funplugin.EnumValue{
-			Value:       WECHAT,
-			Description: "微信",
-		},
-		"ALIPAY": funplugin.EnumValue{
-			Value:       ALIPAY,
-			Description: "支付宝",
-		},
-	}
-}
-
-// 订单状态枚举类型
-type AlbumOrderStatusEnumType uint
-
-const (
-	TO_BE_PAID    AlbumOrderStatusEnumType = 1 //待支付
-	TO_BE_DELIVER AlbumOrderStatusEnumType = 2 //待发货
-	HAS_DELIVER   AlbumOrderStatusEnumType = 3 //已发货
-	HAS_RECEIVED  AlbumOrderStatusEnumType = 4 //已收货
-	CANCELED      AlbumOrderStatusEnumType = 5 //订单取消
-)
-
-func (s AlbumOrderStatusEnumType) Enum() map[string]funplugin.EnumValue {
-	return map[string]funplugin.EnumValue{
-		"TO_BE_PAID": funplugin.EnumValue{
-			Value:       TO_BE_PAID,
-			Description: "待支付",
-		},
-		"TO_BE_DELIVER": funplugin.EnumValue{
-			Value:       TO_BE_DELIVER,
-			Description: "待发货",
-		},
-		"HAS_DELIVER": funplugin.EnumValue{
-			Value:       HAS_DELIVER,
-			Description: "已发货",
-		},
-		"HAS_RECEIVED": funplugin.EnumValue{
-			Value:       HAS_RECEIVED,
-			Description: "已收货",
-		},
-		"CANCELED": funplugin.EnumValue{
-			Value:       CANCELED,
-			Description: "订单取消",
-		},
-	}
-}
-
 // 设计器项目通用状态枚举类型
 type ProJCommonStatusEnumType uint
 
@@ -243,48 +186,6 @@ func (s PageDirectionEnumType) Enum() map[string]funplugin.EnumValue {
 		"H": funplugin.EnumValue{
 			Value:       H,
 			Description: "水平方向",
-		},
-	}
-}
-
-// 订单类型
-type OrderInfoChildrenTypeEnum uint
-
-const (
-	PHOTO_ALBUM OrderInfoChildrenTypeEnum = 1 // 相册系统
-)
-
-func (s OrderInfoChildrenTypeEnum) Enum() map[string]funplugin.EnumValue {
-	return map[string]funplugin.EnumValue{
-		"PHOTO_ALBUM": funplugin.EnumValue{
-			Value:       PHOTO_ALBUM,
-			Description: "相册系统",
-		},
-	}
-}
-
-// 订单状态
-type OrderInfoStatusEnum uint
-
-const (
-	ORDER_UNFINISH OrderInfoStatusEnum = 1 // 未完成
-	ORDER_FINISH   OrderInfoStatusEnum = 2 // 已经完成
-	ORDER_DELETE   OrderInfoStatusEnum = 3 // 已删除
-)
-
-func (s OrderInfoStatusEnum) Enum() map[string]funplugin.EnumValue {
-	return map[string]funplugin.EnumValue{
-		"ORDER_UNFINISH": funplugin.EnumValue{
-			Value:       ORDER_UNFINISH,
-			Description: "未完成",
-		},
-		"ORDER_FINISH": funplugin.EnumValue{
-			Value:       ORDER_FINISH,
-			Description: "已经完成",
-		},
-		"ORDER_DELETE": funplugin.EnumValue{
-			Value:       ORDER_DELETE,
-			Description: "已删除",
 		},
 	}
 }

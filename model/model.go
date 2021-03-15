@@ -39,12 +39,11 @@ func NewDB(gdb *gorm.DB) (err error) {
 	db.SetLogger(&Logger{logrus.StandardLogger()})
 	db.AutoMigrate(&Template{})
 	db.AutoMigrate(&Material{})
-	db.AutoMigrate(&AlbumOrder{})
+	db.AutoMigrate(&Albumorder{})
 	db.AutoMigrate(&Banner{})
 	db.AutoMigrate(&ProJStore{})
 	db.AutoMigrate(&ProJ{})
 	db.AutoMigrate(&Page{})
-	db.AutoMigrate(&OrderInfo{})
 	return nil
 }
 

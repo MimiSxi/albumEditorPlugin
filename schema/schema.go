@@ -10,7 +10,7 @@ import (
 
 var templateSchema *funplugin.ObjectSchema
 var materialSchema *funplugin.ObjectSchema
-var albumOrderSchema *funplugin.ObjectSchema
+var albumorderSchema *funplugin.ObjectSchema
 var bannerSchema *funplugin.ObjectSchema
 var proJStoreSchema *funplugin.ObjectSchema
 var proJSchema *funplugin.ObjectSchema
@@ -78,8 +78,8 @@ func NewPlugSchema(pls funplugin.PluginManger) funplugin.Schema {
 		materialSchema, _ = pls.NewSchemaBuilder(model.Material{})
 		marge(materialSchema)
 
-		albumOrderSchema, _ = pls.NewSchemaBuilder(model.AlbumOrder{})
-		marge(albumOrderSchema)
+		albumorderSchema, _ = pls.NewSchemaBuilder(model.Albumorder{})
+		marge(albumorderSchema)
 
 		bannerSchema, _ = pls.NewSchemaBuilder(model.Banner{})
 		marge(bannerSchema)
@@ -104,7 +104,7 @@ func NewPlugSchema(pls funplugin.PluginManger) funplugin.Schema {
 		Object: map[string]*graphql.Object{
 			"template":      templateSchema.GraphQLType,
 			"material":      materialSchema.GraphQLType,
-			"albumOrder":    albumOrderSchema.GraphQLType,
+			"albumorder":    albumorderSchema.GraphQLType,
 			"banner":        bannerSchema.GraphQLType,
 			"templateStore": proJStoreSchema.GraphQLType,
 			"proJ":          proJSchema.GraphQLType,
