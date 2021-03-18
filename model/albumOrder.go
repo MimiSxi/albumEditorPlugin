@@ -10,6 +10,9 @@ import (
 	"errors"
 	"github.com/Fiber-Man/funplugin/plugin"
 	"github.com/graphql-go/graphql"
+	"reflect"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -23,6 +26,7 @@ type Albumorder struct {
 	Material     AlbumOrderMaterialEnumType  `gorm:"DEFAULT:1;NOT NULL;" gqlschema:"create;querys" description:"材质"`
 	Template     string                      `gorm:"Type:varchar(255);DEFAULT:'';NOT NULL;" gqlschema:"create;querys" description:"使用的相册模板"`
 	UsageType    AlbumOrderUsageTypeEnumType `gorm:"DEFAULT:1;NOT NULL;" gqlschema:"create;querys"  description:"使用类型枚举"`
+	OrderInfoId  uint                        `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"querys" description:"父订单id"`
 	CreatedAt    time.Time                   `description:"创建时间" gqlschema:"querys"`
 	UpdatedAt    time.Time                   `description:"更新时间" gqlschema:"querys"`
 	DeletedAt    *time.Time
@@ -37,8 +41,28 @@ type Albumorders struct {
 	Edges      []Albumorder
 }
 
+type OrderPluginData struct {
+	Order OrderPlugin
+}
+
+type OrderPlugin struct {
+	Orderinfos OrderInfoData
+}
+
+type OrderInfoData struct {
+	Action OrderAction
+}
+
+type OrderAction struct {
+	Create OrderActionProp
+}
+
+type OrderActionProp struct {
+	Id string
+}
+
 // 跨接口创建订单 childrenType = "albumorder"
-func createOrder(userId uint, childrenId uint, childrenType string, remark string, address string, freightPrice uint, goodsPrice uint) (err error) {
+func createOrder(userId uint, childrenId uint, childrenType string, remark string, address string, freightPrice uint, goodsPrice uint) (result interface{}, err error) {
 	mutation := `mutation ($address: String, $childrenId: Int!, $childrenType: String!, $freightPrice: Int, $goodsPrice: Int, $remark: String, $status: OrderStatusEnumType!, $userId: Int!) {
 				  order {
 					orderinfos {
@@ -60,11 +84,26 @@ func createOrder(userId uint, childrenId uint, childrenType string, remark strin
 		"status":       "TO_BE_PAID",
 		"userId":       userId,
 	}
-	_, err = plugin.Go(mutation, params, nil)
+	e := OrderPluginData{}
+	_, err = plugin.Go(mutation, params, &e)
 	if err != nil {
-		return err
+		return nil, err
 	}
+	result = e.Order.Orderinfos.Action.Create.Id
 	return
+}
+
+//ID2id is string to uint
+func ID2id(ID interface{}) (uint, error) {
+	if ID == nil || reflect.TypeOf(ID).String() != "string" {
+		return 0, errors.New("ID Type error")
+	}
+	ID2 := ID.(string)
+	if p1 := strings.Index(ID2, "-"); p1 > -1 {
+		ID2 = ID2[p1+1:]
+	}
+	id, err := strconv.ParseUint(ID2, 10, 64)
+	return uint(id), err
 }
 
 func (o *Albumorder) QueryByID(id uint) (err error) {
@@ -125,8 +164,13 @@ func (o Albumorder) Create(params graphql.ResolveParams) (Albumorder, error) {
 	if p["freightPrice"] != nil {
 		o.TotalPrice = uint(p["freightPrice"].(int))
 	}
-	err := db.Create(&o).Error
-	err = createOrder(o.UserId, o.ID, "albumorder", o.Remark, o.Address, o.FreightPrice, o.TotalPrice)
+	// TODO 事务
+	OrderId, err := createOrder(o.UserId, o.ID, "albumorder", o.Remark, o.Address, o.FreightPrice, o.TotalPrice)
+	if err != nil {
+		return o, err
+	}
+	o.OrderInfoId, err = ID2id(OrderId)
+	err = db.Create(&o).Error
 	return o, err
 }
 

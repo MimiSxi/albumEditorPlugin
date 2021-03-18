@@ -22,6 +22,7 @@ type ProJ struct {
 	Pages      string                   `gorm:"Type:longText;" gqlschema:"create;update" description:"画布"`
 	ImgUpload  string                   `gorm:"Type:text;" gqlschema:"create;update" description:"图片json"`
 	TempUsedId uint                     `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create;update;querys" description:"使用的模版id" funservice:"template"`
+	PagesCount uint                     `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create;update;querys" description:"页数"`
 	IsCopy     uint                     `gorm:"DEFAULT:1;NOT NULL;" exclude:"true"` // 1。代表原生 2拷贝
 	CreatedAt  time.Time                `description:"创建时间" gqlschema:"querys"`
 	UpdatedAt  time.Time                `description:"更新时间" gqlschema:"querys"`
@@ -66,6 +67,9 @@ func (o ProJ) Create(params graphql.ResolveParams) (ProJ, error) {
 	}
 	if p["pages"] != nil {
 		o.Pages = p["pages"].(string)
+	}
+	if p["pagesCount"] != nil {
+		o.PagesCount = uint(p["pagesCount"].(int))
 	}
 	//var pages []Page
 	//if p["pages"] != nil {
@@ -152,6 +156,9 @@ func (o ProJ) Update(params graphql.ResolveParams) (ProJ, error) {
 	}
 	if p["imgUpload"] != nil {
 		v.ImgUpload = p["imgUpload"].(string)
+	}
+	if p["pagesCount"] != nil {
+		v.PagesCount = uint(p["pagesCount"].(int))
 	}
 	err := db.Save(&v).Error
 	return v, err
