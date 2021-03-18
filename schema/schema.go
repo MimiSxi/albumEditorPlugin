@@ -14,6 +14,7 @@ var albumorderSchema *funplugin.ObjectSchema
 var bannerSchema *funplugin.ObjectSchema
 var proJStoreSchema *funplugin.ObjectSchema
 var proJSchema *funplugin.ObjectSchema
+
 //var orderInfoSchema *funplugin.ObjectSchema
 
 //var pageSchema *funplugin.ObjectSchema
@@ -35,7 +36,7 @@ func Init() {
 		proJStoreSchema.GraphQLType.AddFieldConfig("proJ", field)
 	}
 
-	if field, err := plugin.AutoField("ProJId:proj"); err != nil {
+	if field, err := plugin.AutoField("ProId:proj"); err != nil {
 		panic(errors.New("not have object type"))
 	} else {
 		templateSchema.GraphQLType.AddFieldConfig("proJ", field)

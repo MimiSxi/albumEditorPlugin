@@ -8,17 +8,19 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"github.com/graphql-go/graphql"
+	"reflect"
 	"time"
 )
 
 type Template struct {
 	ID                  uint                 `gorm:"primary_key" gqlschema:"update!;delete!;query!;querys" description:"ID"`
 	Name                string               `gorm:"Type:varchar(1000);DEFAULT:'';NOT NULL;" gqlschema:"create!;update;querys" description:"模板名称"`
-	ProId               uint                 `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create;update;querys" funservice:"proJ" description:"ProJId"`
+	ProId               uint                 `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create;update;querys" funservice:"proJ" description:"ProId"`
 	Kind                string               `gorm:"Type:text" gqlschema:"create;update;querys" description:"模板分类"`
 	Theme               string               `gorm:"Type:varchar(255);DEFAULT:'';NOT NULL;" gqlschema:"create;update;querys" description:"模板主题"`
-	Usage               string               `gorm:"Type:varchar(255);DEFAULT:'';NOT NULL;" gqlschema:"create;update;querys" description:"模板用途"`
+	Usages              string               `gorm:"Type:varchar(255);DEFAULT:'';NOT NULL;" gqlschema:"create;update;querys" description:"模板用途"`
 	UseCounts           uint                 `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"querys;update;" description:"使用次数"`
 	Status              CommonStatusEnumType `gorm:"DEFAULT:1;NOT NULL;" gqlschema:"create;update;querys" description:"模板状态"`
 	MedalId             string               `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create;update;querys" description:"勋章id"`
@@ -42,9 +44,9 @@ type Templates struct {
 }
 
 type TemplateGroup struct {
-	Kind  []TemplateGroupType
-	Usage []TemplateGroupType
-	Theme []TemplateGroupType
+	Kind   []TemplateGroupType
+	Usages []TemplateGroupType
+	Theme  []TemplateGroupType
 }
 
 type TemplateGroupType struct {
@@ -78,7 +80,7 @@ func (o Template) Querys(params graphql.ResolveParams) (Templates, error) {
 		return result, err
 	}
 
-	err = db.Model(&Template{}).Select("'usage' as name, COUNT(id) as count").Group("'usage'").Scan(&result.Groups.Usage).Error
+	err = db.Model(&Template{}).Select("usages as name, COUNT(id) as count").Group("usages").Scan(&result.Groups.Usages).Error
 	if err != nil {
 		return result, err
 	}
@@ -96,8 +98,9 @@ func (o Template) Create(params graphql.ResolveParams) (Template, error) {
 	if p["kind"] != nil {
 		o.Kind = p["kind"].(string)
 	}
-	if p["proJ"] != nil {
-		OldProJId := uint(p["proJ"].(int))
+	if p["proId"] != nil {
+		fmt.Println(reflect.TypeOf(p["proId"]))
+		OldProJId := p["proId"].(int)
 		p := &ProJ{}
 		err := db.Where("id = ?", OldProJId).First(p).Error
 		if err != nil {
@@ -124,8 +127,8 @@ func (o Template) Create(params graphql.ResolveParams) (Template, error) {
 	if p["theme"] != nil {
 		o.Theme = p["theme"].(string)
 	}
-	if p["usage"] != nil {
-		o.Usage = p["usage"].(string)
+	if p["usages"] != nil {
+		o.Usages = p["usages"].(string)
 	}
 	if p["medalId"] != nil {
 		o.MedalId = p["medalId"].(string)
@@ -161,8 +164,8 @@ func (o Template) Update(params graphql.ResolveParams) (Template, error) {
 	if p["name"] != nil {
 		v.Name = p["name"].(string)
 	}
-	if p["proJ"] != nil {
-		OldProJId := uint(p["proJ"].(int))
+	if p["proId"] != nil {
+		OldProJId := p["proId"].(int)
 		p := &ProJ{}
 		err := db.Where("id = ?", OldProJId).First(p).Error
 		if err != nil {
@@ -196,7 +199,7 @@ func (o Template) Update(params graphql.ResolveParams) (Template, error) {
 		v.Theme = p["theme"].(string)
 	}
 	if p["usage"] != nil {
-		v.Usage = p["usage"].(string)
+		v.Usages = p["usages"].(string)
 	}
 	if p["medalId"] != nil {
 		v.MedalId = p["medalId"].(string)
