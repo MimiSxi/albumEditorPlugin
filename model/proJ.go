@@ -15,7 +15,7 @@ import (
 
 type ProJ struct {
 	ID         uint                     `gorm:"primary_key" gqlschema:"update!;delete!;query!;querys" description:"设计器项目id"`
-	UserId     uint                     `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create!;querys" description:"创建用户id" funservice:"employee"`
+	UserId     string                   `gorm:"varchar(64);DEFAULT:'';NOT NULL;" gqlschema:"create!;querys" description:"创建用户id"`
 	Status     ProJCommonStatusEnumType `gorm:"DEFAULT:1;NOT NULL;" gqlschema:"update;querys" description:"状态"`
 	Name       string                   `gorm:"Type:varchar(64);DEFAULT:'';NOT NULL;" gqlschema:"create!;update;querys" description:"项目名称"`
 	Cover      string                   `gorm:"Type:longText;" gqlschema:"create!;update;querys" description:"封面"`
@@ -80,7 +80,7 @@ func (o ProJ) Create(params graphql.ResolveParams) (ProJ, error) {
 	//	}
 	//}
 	err := db.Transaction(func(tx *gorm.DB) error {
-		o.UserId = uint(p["userId"].(int))
+		o.UserId = p["userId"].(string)
 		o.Cover = p["cover"].(string)
 		err := tx.Create(&o).Error
 		if err != nil {
