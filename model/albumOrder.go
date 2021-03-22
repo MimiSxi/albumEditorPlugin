@@ -34,6 +34,7 @@ type Albumorder struct {
 	Remark       string `gorm:"-" exclude:"true" gqlschema:"create" description:"订单备注"`
 	Address      string `gorm:"-" exclude:"true" gqlschema:"create" description:"收货地址"`
 	FreightPrice uint   `gorm:"-" exclude:"true" gqlschema:"create" description:"运费"`
+	OrderStatus  string `gorm:"-" exclude:"true" gqlschema:"create!" description:"订单状态:待支付:TO_BE_PAID,待发货:TO_BE_DELIVER"`
 }
 
 type Albumorders struct {
@@ -62,7 +63,7 @@ type OrderActionProp struct {
 }
 
 // 跨接口创建订单 childrenType = "albumorder"
-func createOrder(userId uint, childrenId uint, childrenType string, remark string, address string, freightPrice uint, goodsPrice uint) (result interface{}, err error) {
+func createOrder(userId uint, childrenId uint, childrenType string, remark string, address string, status string, freightPrice uint, goodsPrice uint) (result interface{}, err error) {
 	mutation := `mutation ($address: String, $childrenId: Int!, $childrenType: String!, $freightPrice: Int, $goodsPrice: Int, $remark: String, $status: OrderStatusEnumType!, $userId: Int!) {
 				  order {
 					orderinfos {
@@ -81,7 +82,7 @@ func createOrder(userId uint, childrenId uint, childrenType string, remark strin
 		"freightPrice": freightPrice,
 		"goodsPrice":   goodsPrice,
 		"remark":       remark,
-		"status":       "TO_BE_PAID",
+		"status":       status,
 		"userId":       userId,
 	}
 	e := OrderPluginData{}
@@ -133,6 +134,7 @@ func (o Albumorder) Querys(params graphql.ResolveParams) (Albumorders, error) {
 func (o Albumorder) Create(params graphql.ResolveParams) (Albumorder, error) {
 	p := params.Args
 	o.UserId = uint(p["userId"].(int))
+	o.OrderStatus = p["orderStatus"].(string)
 	// template
 	if p["singlePrice"] != nil {
 		o.SinglePrice = uint(p["singlePrice"].(int))
@@ -165,12 +167,13 @@ func (o Albumorder) Create(params graphql.ResolveParams) (Albumorder, error) {
 		o.TotalPrice = uint(p["freightPrice"].(int))
 	}
 	// TODO 事务
-	OrderId, err := createOrder(o.UserId, o.ID, "albumorder", o.Remark, o.Address, o.FreightPrice, o.TotalPrice)
+	err := db.Create(&o).Error
+	OrderId, err := createOrder(o.UserId, o.ID, "albumorder", o.Remark, o.Address, o.OrderStatus, o.FreightPrice, o.TotalPrice)
 	if err != nil {
 		return o, err
 	}
 	o.OrderInfoId, err = ID2id(OrderId)
-	err = db.Create(&o).Error
+	err = db.Save(&o).Error
 	return o, err
 }
 
