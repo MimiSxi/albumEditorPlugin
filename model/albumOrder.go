@@ -164,7 +164,7 @@ func (o Albumorder) Create(params graphql.ResolveParams) (Albumorder, error) {
 		o.Address = p["address"].(string)
 	}
 	if p["freightPrice"] != nil {
-		o.TotalPrice = uint(p["freightPrice"].(int))
+		o.FreightPrice = uint(p["freightPrice"].(int))
 	}
 	// TODO 事务
 	err := db.Create(&o).Error
