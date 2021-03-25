@@ -40,6 +40,7 @@ func Init() {
 		panic(errors.New("not have object type"))
 	} else {
 		templateSchema.GraphQLType.AddFieldConfig("proJ", field)
+		albumorderSchema.GraphQLType.AddFieldConfig("proJ", field)
 	}
 
 	if field, err := plugin.AutoField("UserId:employee"); err != nil {

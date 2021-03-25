@@ -8,6 +8,7 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"github.com/Fiber-Man/funplugin/plugin"
 	"github.com/graphql-go/graphql"
 	"reflect"
@@ -27,6 +28,7 @@ type Albumorder struct {
 	Template     string                      `gorm:"Type:varchar(255);DEFAULT:'';NOT NULL;" gqlschema:"create;querys" description:"使用的相册模板"`
 	UsageType    AlbumOrderUsageTypeEnumType `gorm:"DEFAULT:1;NOT NULL;" gqlschema:"create;querys"  description:"使用类型枚举"`
 	OrderInfoId  uint                        `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"querys" description:"父订单id"`
+	ProId        uint                        `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create;querys" funservice:"proJ" description:"ProId"`
 	CreatedAt    time.Time                   `description:"创建时间" gqlschema:"querys"`
 	UpdatedAt    time.Time                   `description:"更新时间" gqlschema:"querys"`
 	DeletedAt    *time.Time
@@ -138,6 +140,29 @@ func (o Albumorder) Create(params graphql.ResolveParams) (Albumorder, error) {
 	// template
 	if p["singlePrice"] != nil {
 		o.SinglePrice = uint(p["singlePrice"].(int))
+	}
+	if p["proId"] != nil {
+		fmt.Println(reflect.TypeOf(p["proId"]))
+		OldProJId := p["proId"].(int)
+		p := &ProJ{}
+		err := db.Where("id = ?", OldProJId).First(p).Error
+		if err != nil {
+			return o, err
+		}
+		n := &ProJ{}
+		n.UserId = p.UserId
+		n.Status = p.Status
+		n.Name = p.Name
+		n.Cover = p.Cover
+		n.Pages = p.Pages
+		n.ImgUpload = p.ImgUpload
+		n.TempUsedId = p.TempUsedId
+		n.IsCopy = 2
+		err = db.Create(n).Error
+		if err != nil {
+			return o, err
+		}
+		o.ProId = n.ID
 	}
 	if p["amount"] != nil {
 		o.Amount = uint(p["amount"].(int))
