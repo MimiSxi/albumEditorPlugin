@@ -189,3 +189,24 @@ func (s PageDirectionEnumType) Enum() map[string]funplugin.EnumValue {
 		},
 	}
 }
+
+// 统计返回类型
+type StatisticsReturnKind uint
+
+const (
+	RETURN_DAY   StatisticsReturnKind = 1 // 按天返回
+	RETURN_MONTH StatisticsReturnKind = 2 // 按月返回
+)
+
+func (s StatisticsReturnKind) Enum() map[string]funplugin.EnumValue {
+	return map[string]funplugin.EnumValue{
+		"RETURN_DAY": funplugin.EnumValue{
+			Value:       RETURN_DAY,
+			Description: "按天返回",
+		},
+		"RETURN_MONTH": funplugin.EnumValue{
+			Value:       RETURN_MONTH,
+			Description: "按月返回",
+		},
+	}
+}

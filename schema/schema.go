@@ -15,6 +15,7 @@ var bannerSchema *funplugin.ObjectSchema
 var proJStoreSchema *funplugin.ObjectSchema
 var proJSchema *funplugin.ObjectSchema
 var shareSchema *funplugin.ObjectSchema
+var statisticSchema *funplugin.ObjectSchema
 
 //var orderInfoSchema *funplugin.ObjectSchema
 
@@ -97,6 +98,8 @@ func NewPlugSchema(pls funplugin.PluginManger) funplugin.Schema {
 		shareSchema, _ = pls.NewSchemaBuilder(model.Share{})
 		marge(shareSchema)
 
+		statisticSchema, _ = pls.NewSchemaBuilder(model.Statistic{})
+		marge(statisticSchema)
 		//orderInfoSchema, _ = pls.NewSchemaBuilder(model.OrderInfo{})
 		//marge(orderInfoSchema)
 
@@ -116,6 +119,7 @@ func NewPlugSchema(pls funplugin.PluginManger) funplugin.Schema {
 			"templateStore": proJStoreSchema.GraphQLType,
 			"proJ":          proJSchema.GraphQLType,
 			"share":         shareSchema.GraphQLType,
+			"statistics":    statisticSchema.GraphQLType,
 			//"orderInfo":     orderInfoSchema.GraphQLType,
 
 			//"page":          pageSchema.GraphQLType,
