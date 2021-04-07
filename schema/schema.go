@@ -14,6 +14,7 @@ var albumorderSchema *funplugin.ObjectSchema
 var bannerSchema *funplugin.ObjectSchema
 var proJStoreSchema *funplugin.ObjectSchema
 var proJSchema *funplugin.ObjectSchema
+var shareSchema *funplugin.ObjectSchema
 
 //var orderInfoSchema *funplugin.ObjectSchema
 
@@ -40,6 +41,8 @@ func Init() {
 		panic(errors.New("not have object type"))
 	} else {
 		templateSchema.GraphQLType.AddFieldConfig("proJ", field)
+		albumorderSchema.GraphQLType.AddFieldConfig("proJ", field)
+		shareSchema.GraphQLType.AddFieldConfig("proJ", field)
 	}
 
 	if field, err := plugin.AutoField("UserId:employee"); err != nil {
@@ -91,6 +94,9 @@ func NewPlugSchema(pls funplugin.PluginManger) funplugin.Schema {
 		proJSchema, _ = pls.NewSchemaBuilder(model.ProJ{})
 		marge(proJSchema)
 
+		shareSchema, _ = pls.NewSchemaBuilder(model.Share{})
+		marge(shareSchema)
+
 		//orderInfoSchema, _ = pls.NewSchemaBuilder(model.OrderInfo{})
 		//marge(orderInfoSchema)
 
@@ -109,6 +115,7 @@ func NewPlugSchema(pls funplugin.PluginManger) funplugin.Schema {
 			"banner":        bannerSchema.GraphQLType,
 			"templateStore": proJStoreSchema.GraphQLType,
 			"proJ":          proJSchema.GraphQLType,
+			"share":         shareSchema.GraphQLType,
 			//"orderInfo":     orderInfoSchema.GraphQLType,
 
 			//"page":          pageSchema.GraphQLType,

@@ -17,6 +17,7 @@ type Banner struct {
 	Pic1      string    `gorm:"Type:varchar(1000);DEFAULT:'';NOT NULL;" gqlschema:"create;update;querys" description:"轮番图1"`
 	Pic2      string    `gorm:"Type:varchar(1000);DEFAULT:'';NOT NULL;" gqlschema:"create;update;querys" description:"轮番图2"`
 	Pic3      string    `gorm:"Type:varchar(1000);DEFAULT:'';NOT NULL;" gqlschema:"create;update;querys" description:"轮番图3"`
+	Pic4      string    `gorm:"Type:varchar(1000);DEFAULT:'';NOT NULL;" gqlschema:"create;update;querys" description:"轮番图4"`
 	CreatedAt time.Time `description:"创建时间" gqlschema:"querys"`
 	UpdatedAt time.Time `description:"更新时间" gqlschema:"querys"`
 	DeletedAt *time.Time
@@ -59,6 +60,9 @@ func (o Banner) Create(params graphql.ResolveParams) (Banner, error) {
 	if p["pic3"] != nil {
 		o.Pic3 = p["pic3"].(string)
 	}
+	if p["pic4"] != nil {
+		o.Pic4 = p["pic4"].(string)
+	}
 	err := db.Create(&o).Error
 	return o, err
 }
@@ -77,6 +81,9 @@ func (o Banner) Update(params graphql.ResolveParams) (Banner, error) {
 	}
 	if p["pic3"] != nil {
 		v.Pic3 = p["pic3"].(string)
+	}
+	if p["pic4"] != nil {
+		v.Pic4 = p["pic4"].(string)
 	}
 	err := db.Save(&v).Error
 	return v, err

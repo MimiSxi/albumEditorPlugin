@@ -15,13 +15,14 @@ import (
 
 type ProJ struct {
 	ID         uint                     `gorm:"primary_key" gqlschema:"update!;delete!;query!;querys" description:"设计器项目id"`
-	UserId     uint                     `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create!;querys" description:"创建用户id" funservice:"employee"`
+	UserId     string                   `gorm:"varchar(64);DEFAULT:'';NOT NULL;" gqlschema:"create!;querys" description:"创建用户id"`
 	Status     ProJCommonStatusEnumType `gorm:"DEFAULT:1;NOT NULL;" gqlschema:"update;querys" description:"状态"`
 	Name       string                   `gorm:"Type:varchar(64);DEFAULT:'';NOT NULL;" gqlschema:"create!;update;querys" description:"项目名称"`
 	Cover      string                   `gorm:"Type:longText;" gqlschema:"create!;update;querys" description:"封面"`
 	Pages      string                   `gorm:"Type:longText;" gqlschema:"create;update" description:"画布"`
 	ImgUpload  string                   `gorm:"Type:text;" gqlschema:"create;update" description:"图片json"`
 	TempUsedId uint                     `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create;update;querys" description:"使用的模版id" funservice:"template"`
+	PagesCount uint                     `gorm:"DEFAULT:0;NOT NULL;" gqlschema:"create;update;querys" description:"页数"`
 	IsCopy     uint                     `gorm:"DEFAULT:1;NOT NULL;" exclude:"true"` // 1。代表原生 2拷贝
 	CreatedAt  time.Time                `description:"创建时间" gqlschema:"querys"`
 	UpdatedAt  time.Time                `description:"更新时间" gqlschema:"querys"`
@@ -67,6 +68,9 @@ func (o ProJ) Create(params graphql.ResolveParams) (ProJ, error) {
 	if p["pages"] != nil {
 		o.Pages = p["pages"].(string)
 	}
+	if p["pagesCount"] != nil {
+		o.PagesCount = uint(p["pagesCount"].(int))
+	}
 	//var pages []Page
 	//if p["pages"] != nil {
 	//	pageJson := p["pages"].(string)
@@ -76,7 +80,7 @@ func (o ProJ) Create(params graphql.ResolveParams) (ProJ, error) {
 	//	}
 	//}
 	err := db.Transaction(func(tx *gorm.DB) error {
-		o.UserId = uint(p["userId"].(int))
+		o.UserId = p["userId"].(string)
 		o.Cover = p["cover"].(string)
 		err := tx.Create(&o).Error
 		if err != nil {
@@ -152,6 +156,9 @@ func (o ProJ) Update(params graphql.ResolveParams) (ProJ, error) {
 	}
 	if p["imgUpload"] != nil {
 		v.ImgUpload = p["imgUpload"].(string)
+	}
+	if p["pagesCount"] != nil {
+		v.PagesCount = uint(p["pagesCount"].(int))
 	}
 	err := db.Save(&v).Error
 	return v, err
