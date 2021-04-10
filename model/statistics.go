@@ -37,6 +37,15 @@ type TotalOverviews struct {
 	TotalOverviews []TotalOverview
 }
 
+type TotalMoney struct {
+	Abscissa int64   // 横坐标
+	Quantity float64 // 数量
+}
+
+type TotalMoneys struct {
+	TotalOverviews []TotalMoney
+}
+
 // 相册使用数量
 func (o Statistic) Countprojs(params graphql.ResolveParams) (TotalOverviews, error) {
 	var result TotalOverviews
@@ -94,8 +103,8 @@ func (o Statistic) Countorder(params graphql.ResolveParams) (TotalOverviews, err
 }
 
 // 统计订单金额
-func (o Statistic) Countordermoney(params graphql.ResolveParams) (TotalOverviews, error) {
-	var result TotalOverviews
+func (o Statistic) Countordermoney(params graphql.ResolveParams) (TotalMoneys, error) {
+	var result TotalMoneys
 	p := params.Args
 	beginTime, ok := p["beginTime"].(time.Time)
 	if !ok {
