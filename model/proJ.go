@@ -50,7 +50,7 @@ func (o ProJ) Querys(params graphql.ResolveParams) (ProJs, error) {
 	if err != nil {
 		return result, err
 	}
-	err = dbcount.Count(&result.TotalCount).Error
+	err = dbcount.Where("is_copy = 1").Count(&result.TotalCount).Error
 	return result, err
 }
 
